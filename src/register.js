@@ -2,15 +2,15 @@ import process from 'node:process';
 import * as util from './lib/util.js';
 
 const ROOT = import.meta.dirname;
-const CMDS_DIR = `${ROOT}/commands`;
 const LOG_FILE = `${ROOT}/commands/log.json`;
+const COMMANDS_GLOB = `${ROOT}/commands/**/*.js`;
 
 const APP_ID = process.env.APP_ID;
 const APP_TOKEN = process.env.TOKEN;
 const TEST_GUILD = process.env.TEST_GUILD_ID;
 
 const $action = process.argv[2];
-const $commands = process.argv[3]?.split(',') ?? [];
+const $commands = process.argv[3]?.split?.(',') ?? [];
 const $guild = process.argv[4] === 'TEST' ? TEST_GUILD : (process.argv[4] || '');
 
 async function api(url, body) {
@@ -89,12 +89,10 @@ class Log {
 
 const commands = [];
 const log = await new Log().load();
-const files = util.files(CMDS_DIR, ['.js'], 1);
 const path = $guild ? `guilds/${$guild}/commands` : 'commands';
 
-for await (const file of files) {
-    const path = `${file}`.replace(ROOT, '.');
-    const module = await import(path);
+for await (let file of util.fsp.glob(COMMANDS_GLOB)) {
+    const module = await import(`file://${file}`);
 
     if (
         ($guild || module.global === true) &&

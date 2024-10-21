@@ -3,6 +3,7 @@ import fsp from 'node:fs/promises';
 import util from 'node:util';
 import crypto from 'node:crypto';
 
+export { fs, fsp };
 export const node = util;
 
 export function log(...args) {
@@ -126,37 +127,4 @@ export async function load(path, defval) {
 export async function dump(path, data, space) {
     data = serialize(data, space);
     return fsp.writeFile(path, data, { encoding: 'utf8' });
-}
-
-/**
- * Enumerates files and directories in a given path.
- */
-export async function *files(path, filter, recursive) {
-    if (!fs.existsSync(path)) return;
-
-    const check = (
-        typeof(filter) === 'function' ? filter :
-        item => (
-            filter === undefined || filter === null ? true :
-            recursive && item.isDirectory() ? false :
-            filter.some(e => item.name.endsWith(e))
-        )
-    );
-
-    const items = await fsp.readdir(path, { withFileTypes: true });
-
-    for (const item of items) {
-        const fullpath = `${path}/${item.name}`;
-        item.toString = () => fullpath;
-
-        if (recursive && item.isDirectory()) {
-            if (recursive === 2 && check(item))
-                yield item;
-            yield * files(fullpath, check, recursive);
-            continue;
-        }
-
-        if (check(item))
-            yield item;
-    }
 }

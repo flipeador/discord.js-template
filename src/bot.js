@@ -4,6 +4,8 @@ import { Client, GatewayIntentBits } from 'discord.js';
 import * as util from './lib/util.js';
 
 const ROOT = import.meta.dirname;
+const EVENTS_GLOB = `${ROOT}/events/*.js`;
+const COMMANDS_GLOB = `${ROOT}/commands/**/*.js`;
 
 class Bot {
     id = 0;
@@ -82,16 +84,14 @@ class Bot {
     }
 
     async loadCommands() {
-        const files = util.files(`${ROOT}/commands`, ['.js'], 1);
-        for await (const file of files) {
+        for await (const file of util.fsp.glob(COMMANDS_GLOB)) {
             const command = await import(`file://${file}`);
             this.commands.set(command.data.name, command);
         }
     }
 
     async registerEvents() {
-        const files = util.files(`${ROOT}/events`, ['.js']);
-        for await (const file of files) {
+        for await (const file of util.fsp.glob(EVENTS_GLOB)) {
             const event = await import(`file://${file}`);
             this.client[event.once ? 'once' : 'on'](
                 event.name, event.execute
