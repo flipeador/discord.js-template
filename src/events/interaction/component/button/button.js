@@ -9,7 +9,7 @@ import {
 export async function execute(interaction) {
     const data = interaction.client.bot.useId(interaction);
 
-    if (data?.file?.endsWith('.js')) {
+    if (data?.file?.endsWith?.('.js')) {
         const button = await import(`./buttons/${data.file}`);
         return await button.execute(interaction, data);
     }
