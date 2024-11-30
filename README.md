@@ -12,41 +12,49 @@ Currently, the module is loaded but the database is not used.
 
 Create a Discord bot application, see [Discord.js Guide - Setting up a bot application][setup].
 
-Install the bot application in your private test guild and user account:
-
-- Navigate to [Discord Developers - Applications][apps].
-- Select your bot, and go to `OAuth2 -> OAuth2 URL Generator`.
-- Integration type: Guild Install.
-  - Scopes: `bot` `application.commands`.
-  - Permissions: `Send Messages` `Use Slash Commands`.
-- Integration type: User Install.
-  - Scopes: `application.commands`.
-- Visit the generated URLs to authorize both integration types.
+> 🤖 Generate an invite link for your application.
+>
+> 1. Navigate to [Discord Developers - Applications][apps].
+> 2. Scroll down and select your app, copy the **Application ID**.
+> 3. Replace `000000000000000000` with your app ID in the URLs below.
+>
+> Add the application to your private test server:
+> ```
+> https://discord.com/oauth2/authorize?client_id=000000000000000000&permissions=2147485696&integration_type=0&scope=bot+applications.commands
+> ```
+>
+> Add the application to your user account to use it anywhere:
+> ```
+> https://discord.com/oauth2/authorize?client_id=000000000000000000&integration_type=1&scope=applications.commands
+> ```
 
 Before starting up the bot, you will need to install and configure a few things.
 
-Install [pnpm][pnpm], then run the following command to install the latest version of [Node.js][node]:
+Install [pnpm][pnpm], then run the following command in the [Terminal][terminal] to install the latest version of [Node.js][node]:
 
-```ps1
+```sh
 pnpm env use latest -g
 ```
 
 Download or [clone][clone] the repository, open the root directory with [Visual Studio Code][code].
 
-Open the [VS Code Terminal][terminal], and run the following command to install all required dependencies:
+Open the [VS Code Terminal][code-terminal], and run the following command to install all required dependencies:
 
-```ps1
+```sh
 pnpm install
+
+# Optionally, update all dependencies to their latest versions.
+pnpm up --latest
 ```
 
-Install the [VS Code ESLint extension][eslint], it helps you find and fix problems with your JavaScript code. \
+Install the [VS Code ESLint extension][code-eslint], it helps you find and fix problems with your JavaScript code. \
 Once the extension is installed, the following command can be used to check for problems in all files:
 
-```ps1
+```sh
 node --run lint
 ```
 
-Open the [VS Code Command Palette][palette] with <kbd><kbd>CTRL</kbd>+<kbd>SHIFT</kbd>+<kbd>P</kbd></kbd>,
+Open the [VS Code Command Palette][code-palette] with <kbd><kbd>CTRL</kbd>+<kbd>SHIFT</kbd>+<kbd>P</kbd></kbd>,
 and select `Developer: Reload Window`.
 
 Rename [`.sample.env`](.sample.env) to `.env`, and configure the required fields:
@@ -58,6 +66,7 @@ Run the following commands to register application commands and start the bot:
 ```ps1
 # Register all commands in the test server.
 node --run reg -- bulk ALL TEST
+
 # Start the bot and log in to Discord.
 node --run bot
 ```
@@ -126,13 +135,14 @@ See the [license file](LICENSE) for details.
 [sqlite]: https://nodejs.org/api/sqlite.html
 [process]: https://nodejs.org/api/child_process.html#class-childprocess
 [v2250]: https://nodejs.org/en/blog/release/v22.5.0
-
 [pnpm]: https://pnpm.io/installation
 
+[terminal]: https://docs.microsoft.com/windows/terminal
+
 [code]: https://code.visualstudio.com
-[terminal]: https://code.visualstudio.com/docs/terminal/basics
-[palette]: https://code.visualstudio.com/docs/getstarted/userinterface#_command-palette
-[eslint]: https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint
+[code-terminal]: https://code.visualstudio.com/docs/terminal/basics
+[code-palette]: https://code.visualstudio.com/docs/getstarted/userinterface#_command-palette
+[code-eslint]: https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint
 
 [apps]: https://discord.com/developers/applications
 [regcmds]: https://discord.com/developers/docs/tutorials/upgrading-to-application-commands#registering-commands
