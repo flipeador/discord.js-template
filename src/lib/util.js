@@ -62,6 +62,8 @@ export function serialize(value, space) {
 }
 
 export function deserialize(value) {
+    if (typeof(value) !== 'string') return;
+
     return JSON.parse(value, (_, value) => {
         if (value && typeof(value) === 'object' && value.__type === 'Error') {
             delete value.__type;

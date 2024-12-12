@@ -48,18 +48,17 @@ export async function execute(interaction) {
     // By default, the message is ephemeral if the target is not specified.
     const ephemeral = interaction.options.getBoolean('ephemeral') ?? !target;
 
-    // events/interaction/modal/forms/eval.js
-    const customId = interaction.client.bot.createId({
-        target,
-        ephemeral,
-        file: 'eval.js'
-    });
+    // The name of the file that handles the event when the modal is submitted.
+    const module = 'eval.js'; // src/events/interaction/modal/forms/eval.js
+
+    // Create a custom ID and associate data with it.
+    const customId = interaction.client.bot.createId({ target, ephemeral, module });
 
     const defaultValue = util.stripIndents(/* js */`
         (interaction) => {
-            // Evaluates code in 'bot.js'.
+            // This code is evaluated in 'bot.js'.
             return interaction.client.bot.eval(ctx => {
-                // Evaluates code in 'index.js'.
+                // This code is evaluated in 'index.js'.
                 return 'Shard ID: ' + ctx.shard.id;
             });
         }

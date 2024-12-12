@@ -47,16 +47,20 @@ manager.on('shardCreate', shard => {
     });
 
     shard.on('message', async message => {
-        if (!message.id) return;
-        try {
-            const ctx = { database, manager, shard };
-            const args = util.deserialize(message.args);
-            const result = await util.evalfn(message.fn, ctx, ...args);
-            shard.send({ id: message.id, result: util.serialize(result) });
-        }
-        catch (error) {
-            util.log(`[${shard.id}] Shard Message:`, error);
-            shard.send({ id: message.id, error: util.serialize(error) });
+        message = util.deserialize(message);
+        if (message === undefined) return;
+
+        if (message.__command === 'eval') {
+            const { id, fn, args } = message;
+            try {
+                const ctx = { database, manager, shard };
+                const result = await util.evalfn(fn, ctx, ...args);
+                shard.send(util.serialize({ id, result }));
+            }
+            catch (error) {
+                shard.send(util.serialize({ id, error }));
+                util.log(`[${shard.id}] Shard Message:`, error);
+            }
         }
     });
 });

@@ -1,15 +1,16 @@
 import process from 'node:process';
+import * as util from './lib/util.js';
 import { Client, GatewayIntentBits } from 'discord.js';
 
-import * as util from './lib/util.js';
-
 const ROOT = import.meta.dirname;
-const EVENTS_GLOB = `${ROOT}/events/*.js`;
-const COMMANDS_GLOB = `${ROOT}/commands/**/*.js`;
+const EVENTS = `${ROOT}/events/*.js`;
+const COMMANDS = `${ROOT}/commands/**/*.js`;
+
+const $TIMER = Symbol();
 
 class Bot {
-    id = 0;
-    ids = new Map();
+    #id = 0;
+    #ids = new Map();
     commands = new Map();
 
     constructor() {
@@ -23,31 +24,41 @@ class Bot {
 
         this.client.bot = this;
 
-        process.on('message', this.onMessage.bind(this));
+        process.on('message', this.#onMessage.bind(this));
     }
 
     /**
      * Processes messages sent from the parent process.
+     * @private
      */
-    onMessage(message) {
-        if (!message.id) return;
+    #onMessage(message) {
+        message = util.deserialize(message);
+        if (message === undefined) return;
         const data = this.useId(message.id);
         'error' in message ?
-        data?.reject?.(util.deserialize(message.error)) :
-        data?.resolve?.(util.deserialize(message.result));
+        data?.reject?.(message.error) :
+        data?.resolve?.(message.result);
     }
 
     /**
      * Creates a unique temporary ID.
+     * @param {object} data
+     * The data to associate with the ID.
+     * @param {string} [data.module]
+     * The name of a file used to handle component and modal events. \
+     * Search for `module?.endsWith` to find all files that check this key. \
+     * For example, the [`/eval`](commands/chat/eval.js) slash command uses it for a modal.
+     * @param {number} [timeout=600000]
+     * The number of milliseconds to wait before the ID expires.
      */
     createId(data, timeout=600000) {
-        const id = `${this.id++}`;
-        this.ids.set(id, data);
-        data.timer = setTimeout(
+        const id = `${this.#id++}`;
+        this.#ids.set(id, data);
+        data[$TIMER] = setTimeout(
             () => {
-                const data = this.ids.get(id);
-                this.ids.delete(id) &&
-                data?.reject?.(new Error('Timeout'));
+                delete data[$TIMER];
+                this.#ids.delete(id);
+                data.reject?.(new Error('Timeout'));
             },
             timeout
         );
@@ -60,9 +71,11 @@ class Bot {
     useId(id) {
         if (typeof(id) === 'object')
             id = id?.customId ?? id;
-        const data = this.ids.get(id);
-        this.ids.delete(id) &&
-        clearTimeout(data.timer);
+        const data = this.#ids.get(id);
+        if (this.#ids.delete(id)) {
+            clearTimeout(data[$TIMER]);
+            delete data[$TIMER];
+        }
         return data;
     }
 
@@ -72,7 +85,7 @@ class Bot {
     async send(data) {
         return new Promise((resolve, reject) => {
             data.id = this.createId({ resolve, reject });
-            process.send(data);
+            process.send(util.serialize(data));
         });
     }
 
@@ -80,22 +93,21 @@ class Bot {
      * Evaluates JavaScript code in the parent process.
      */
     async eval(fn, ...args) {
-        return this.send({ fn: `${fn}`, args: util.serialize(args) });
+        return this.send({ __command: 'eval', fn: `${fn}`, args });
     }
 
     async loadCommands() {
-        for await (const file of util.fsp.glob(COMMANDS_GLOB)) {
+        for await (const file of util.fsp.glob(COMMANDS)) {
             const command = await import(`file://${file}`);
             this.commands.set(command.data.name, command);
         }
     }
 
     async registerEvents() {
-        for await (const file of util.fsp.glob(EVENTS_GLOB)) {
+        for await (const file of util.fsp.glob(EVENTS)) {
             const event = await import(`file://${file}`);
-            this.client[event.once ? 'once' : 'on'](
-                event.name, event.execute
-            );
+            const method = event.once ? 'once' : 'on';
+            this.client[method](event.name, event.execute);
         }
     }
 }

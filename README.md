@@ -2,10 +2,11 @@
 
 A basic Discord bot application template using [Discord.js][djs] v14.
 
-The template uses the [Discord.js][djs] built-in `ShardingManager` to run shards in [separate processes][process]. \
+The template uses the [Discord.js][djs] built-in `ShardingManager` to run shards in [separate processes][node-ipc]. \
 Although [sharding][sharding] is only required at 2500 guilds, doing so in advance should not be a problem.
 
-The [native `node:sqlite` module][sqlite] of [Node.js v22.5.0][v2250] is used for the database. \
+The [native `node:sqlite` module][node-sqlite] added in [Node.js 22.5][v2250] is used for the [SQLite][sqlite] database. \
+Starting with [Node.js 23.4][v2340], the module can be used without the `--experimental-sqlite` CLI flag. \
 Currently, the module is loaded but the database is not used.
 
 # Instructions
@@ -18,40 +19,51 @@ Create a Discord bot application, see [Discord.js Guide - Setting up a bot appli
 > 2. Scroll down and select your app, copy the **Application ID**.
 > 3. Replace `000000000000000000` with your app ID in the URLs below.
 >
-> Add the application to your private test server:
+> Add the bot application to your private test server:
 > ```
 > https://discord.com/oauth2/authorize?client_id=000000000000000000&permissions=2147485696&integration_type=0&scope=bot+applications.commands
 > ```
 >
-> Add the application to your user account to use it anywhere:
+> Add the bot application to your user account to use it anywhere:
 > ```
 > https://discord.com/oauth2/authorize?client_id=000000000000000000&integration_type=1&scope=applications.commands
 > ```
+> Adding the bot application to your user account allows its use even on servers where it is not installed. \
+> If the server has the `Use External Apps` permission disabled, the bot's messages will be visible only to you. [^1]
 
 Before starting up the bot, you will need to install and configure a few things.
 
-Install [pnpm][pnpm], then run the following command in the [Terminal][terminal] to install the latest version of [Node.js][node]:
+Install [pnpm][pnpm], then run the following command in the [Terminal][terminal] to install [Node.js][node]:
 
 ```sh
-pnpm env use latest -g
+# Install the latest version of NodeJS.
+pnpm env use latest --global
+
+# Once NodeJS is installed, you can close the terminal.
+# We will use the VS Code integrated terminal from now on.
 ```
 
-Download or [clone][clone] the repository, open the root directory with [Visual Studio Code][code].
+[Clone][clone] this repository to your local computer, open the root directory with [Visual Studio Code][code]. \
+Alternatively, you can [create a new repository using this template][template], then [clone][clone] your own repository.
 
-Open the [VS Code Terminal][code-terminal], and run the following command to install all required dependencies:
+Run the following command in the [VS Code Terminal][code-terminal] to install all required dependencies:
 
 ```sh
+# Install all dependencies for the project.
 pnpm install
 
 # Optionally, update all dependencies to their latest versions.
-pnpm up --latest
+pnpm update --latest
 ```
 
-Install the [VS Code ESLint extension][code-eslint], it helps you find and fix problems with your JavaScript code. \
-Once the extension is installed, the following command can be used to check for problems in all files:
+Install the [VS Code ESLint extension][code-eslint], it helps you find and fix problems with your JavaScript code.
 
 ```sh
+# Check for problems in all files.
 node --run lint
+
+# Tool for inspecting ESLint configs.
+node --run lint:ci
 ```
 
 Open the [VS Code Command Palette][code-palette] with <kbd><kbd>CTRL</kbd>+<kbd>SHIFT</kbd>+<kbd>P</kbd></kbd>,
@@ -71,7 +83,7 @@ node --run reg -- bulk ALL TEST
 node --run bot
 ```
 
-The bot should be up and running by now, check the information displayed in the console.
+The bot should be up and running by now, check the information displayed in the terminal.
 
 Continue reading [Application Commands](#application-commands) to learn how to create and register app commands.
 
@@ -116,9 +128,9 @@ The following table specifies all available application commands that serve as e
 > - Once the [modal][modals] or pop-up form appears, provide the following code:
 > ```js
 > (interaction) => {
->     // Evaluates code in 'src/bot.js'.
+>     // This code is evaluated in 'src/bot.js'.
 >     interaction.client.bot.eval(async ({ manager }) => {
->         // Evaluates code in 'src/index.js'.
+>         // This code is evaluated in 'src/index.js'.
 >         await manager.broadcastEval(client => client.destroy());
 >         process.exit(); // terminate the process (src/index.js)
 >     });
@@ -130,12 +142,18 @@ The following table specifies all available application commands that serve as e
 This project is licensed under the **GNU General Public License v3.0**.
 See the [license file](LICENSE) for details.
 
+<!-- Footnotes -->
+[^1]: [YouTube — PSA: Discord added a New Raid and Scamming Method... (@NoTextToSpeech)](https://youtu.be/6vjG34uyPz0)
+
 <!-- Reference Links -->
 [node]: https://nodejs.org
-[sqlite]: https://nodejs.org/api/sqlite.html
-[process]: https://nodejs.org/api/child_process.html#class-childprocess
+[node-sqlite]: https://nodejs.org/api/sqlite.html
+[node-ipc]: https://nodejs.org/api/child_process.html#class-childprocess
 [v2250]: https://nodejs.org/en/blog/release/v22.5.0
+[v2340]: https://nodejs.org/en/blog/release/v23.4.0
+
 [pnpm]: https://pnpm.io/installation
+[sqlite]: https://sqlite.org
 
 [terminal]: https://docs.microsoft.com/windows/terminal
 
@@ -154,3 +172,4 @@ See the [license file](LICENSE) for details.
 [modals]: https://discordjs.guide/interactions/modals.html
 
 [clone]: https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository
+[template]: https://github.com/new?template_name=discord.js-template&template_owner=flipeador

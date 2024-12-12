@@ -5,6 +5,8 @@ import {
 
 import * as util from '../../../../lib/util.js';
 
+const MAXCHARS = 4000;
+
 /**
  * Represents a modal submit interaction.
  * @param {ModalSubmitInteraction} interaction
@@ -31,7 +33,7 @@ export async function execute(interaction, data) {
     const content = (target ? `${target}\n` : '') + '```js\n\t\n```';
 
     evaled = evaled.replaceAll('`', 'ˋ');
-    evaled = util.shorten(evaled, 2000 - content.length + 1);
+    evaled = util.shorten(evaled, MAXCHARS - content.length + 1);
 
     await interaction.editReply(content.replace('\t', evaled));
 }

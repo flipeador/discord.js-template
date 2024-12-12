@@ -3,7 +3,7 @@
 
 // Tool for inspecting ESLint flat configs.
 // https://github.com/eslint/config-inspector
-// npx @eslint/config-inspector
+// pnpm dlx @eslint/config-inspector
 
 // Global identifiers from different JavaScript environments.
 // https://github.com/sindresorhus/globals
