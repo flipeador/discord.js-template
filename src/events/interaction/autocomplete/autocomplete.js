@@ -2,7 +2,7 @@ import {
     AutocompleteInteraction // eslint-disable-line no-unused-vars
 } from 'discord.js';
 
-import * as util from '../../../lib/util.js';
+import * as util from '@lib/util.js';
 
 /**
  * Represents an autocomplete interaction.

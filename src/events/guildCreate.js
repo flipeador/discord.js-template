@@ -3,7 +3,7 @@ import {
     Events
 } from 'discord.js';
 
-import * as util from '../lib/util.js';
+import * as util from '@lib/util.js';
 
 export const name = Events.GuildCreate;
 

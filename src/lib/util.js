@@ -6,6 +6,8 @@ import crypto from 'node:crypto';
 export { fs, fsp };
 export const node = util;
 
+export const AsyncFunction = async function () {}.constructor;
+
 export function log(...args) {
     args = args.map(arg => {
         if (typeof(arg) === 'string')
@@ -21,23 +23,27 @@ export function log(...args) {
 
 /**
  * Shorten a string by adding a suffix.
+ * @param {string} str
+ * @param {number} limit
+ * @param {string} suffix
+ * @returns {string}
  */
 export function shorten(str, limit, suffix='...') {
-    if (limit < suffix.length) return '';
     if (limit >= str.length) return str;
+    if (limit < suffix.length) return '';
     return str.slice(0, limit-suffix.length) + suffix;
 }
 
 /**
- * Removes all indentation from each line of a multiline string.
+ * Remove all indentation from each line of a multiline string.
  */
-export function stripIndents(string) {
-    string = string.split('\n').slice(1, -1);
+export function stripIndents(str) {
+    str = str.split('\n').slice(1, -1);
     const indent = Math.min(
-        ...string.filter(str => str.trim())
-        .map(str => str.match(/^\s*/)[0].length)
+        ...str.filter(str => str.trim())
+            .map(str => str.match(/^\s*/)[0].length)
     );
-    return string.map(str => str.slice(indent)).join('\n');
+    return str.map(s => s.slice(indent)).join('\n');
 }
 
 export function serialize(value, space) {
@@ -65,42 +71,33 @@ export function deserialize(value) {
     if (typeof(value) !== 'string') return;
 
     return JSON.parse(value, (_, value) => {
-        if (value && typeof(value) === 'object' && value.__type === 'Error') {
+        if (typeof(value) === 'object' && value?.__type) {
+            const type = value.__type;
             delete value.__type;
-            return Object.assign(
-                new Error(undefined,
-                    'cause' in value ?
-                    { cause: value.cause } :
-                    { }
-                ),
-                value
-            );
+            if (type === 'Error')
+                return Object.assign(
+                    new Error(undefined,
+                        'cause' in value ?
+                        { cause: value.cause } :
+                        { }
+                    ),
+                    value
+                );
         }
         return value;
     });
 }
 
 /**
- * Evaluates a function and returns its result.
+ * Evaluate a function and returns its result.
  */
 export function evalfn(fn, ...args) {
-    fn = Function(`return (${fn}\n)(...arguments)`);
+    fn = Function(`return(${fn}\n)(...arguments)`);
     return fn(...args);
 }
 
 /**
- * Generates a random ID of `length` characters.
- */
-export function generateId(length, min=33, max=126) {
-    const buffer = crypto.randomBytes(length);
-    let id = '', count = max - min + 1;
-    while (--length >= 0)
-        id += String.fromCodePoint(min + buffer[length] % count);
-    return id;
-}
-
-/**
- * Generate a random number in a given range.
+ * Generate a cryptographically strong random number in a given range.
  */
 export function random(min, max) {
     const array = new Uint32Array(1);
@@ -109,13 +106,44 @@ export function random(min, max) {
     return Math.floor(value * (max - min + 1)) + min;
 }
 
+/**
+ * Choose a random element from an array.
+ * @param {Array} array
+ * @param {boolean} [remove]
+ * Whether to remove the chosen element from the array.
+ */
+export function choise(array, remove) {
+    const index = random(0, array.length-1);
+    if (!remove) return array[index];
+    return array.splice(index, 1)[0];
+}
+
 export function timeout(min, max) {
     const ms = max === undefined ? min : random(min, max);
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 /**
- * Loads JSON data from a file.
+ * Parse a string to determine a time duration.
+ * @param {string} str
+ * The input string representing a duration or a date.
+ * @returns {number}
+ * The duration, in milliseconds.
+ */
+export function duration(str) {
+    if (str.search(/[/-]/) !== -1)
+        return Date.parse(`${str} UTC`) - Date.now();
+
+    const units = { d: 86400000, h: 3600000, m: 60000, s: 1000 };
+
+    return str.matchAll(/\b(\d+)(d|h|m|s)\b/g).reduce(
+        (total, m) => total + Number(m[1]) * units[m[2]],
+        0
+    );
+}
+
+/**
+ * Load JSON data from a file.
  */
 export async function load(path, defval) {
     if (defval !== undefined && !fs.existsSync(path))
@@ -124,7 +152,7 @@ export async function load(path, defval) {
 }
 
 /**
- * Dumps JSON data to a file.
+ * Dump JSON data to a file.
  */
 export async function dump(path, data, space) {
     data = serialize(data, space);

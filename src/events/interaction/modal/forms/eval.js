@@ -1,9 +1,10 @@
 import {
     User, // eslint-disable-line no-unused-vars
-    ModalSubmitInteraction // eslint-disable-line no-unused-vars
+    ModalSubmitInteraction, // eslint-disable-line no-unused-vars
+    MessageFlags
 } from 'discord.js';
 
-import * as util from '../../../../lib/util.js';
+import * as util from '@lib/util.js';
 
 const MAXCHARS = 4000;
 
@@ -20,7 +21,7 @@ export async function execute(interaction, data) {
 
     const { target, ephemeral } = data;
 
-    await interaction.deferReply({ ephemeral });
+    await interaction.deferReply({ flags: ephemeral ? MessageFlags.Ephemeral : 0 });
 
     let evaled = await util.evalfn(
         interaction.fields.getTextInputValue('code'),

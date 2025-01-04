@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@lib/*": ["src/lib/*"]
+    },
+    "lib": ["ESNext"],
+    "target": "ESNext",
+    "module": "preserve"
+  }
+}

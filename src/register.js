@@ -1,12 +1,12 @@
 import process from 'node:process';
-import * as util from './lib/util.js';
+import * as util from '@lib/util.js';
 
 const ROOT = import.meta.dirname;
 const LOG_FILE = `${ROOT}/commands/log.json`;
 const COMMANDS_GLOB = `${ROOT}/commands/**/*.js`;
 
 const APP_ID = process.env.APP_ID;
-const APP_TOKEN = process.env.TOKEN;
+const APP_TOKEN = process.env.BOT_TOKEN;
 const TEST_GUILD = process.env.TEST_GUILD_ID;
 
 const $action = process.argv[2];
@@ -24,7 +24,7 @@ async function api(url, body) {
                 Authorization: `Bot ${APP_TOKEN}`,
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(body)
+            body: body === undefined ? body : JSON.stringify(body)
         }
     );
 
@@ -91,7 +91,7 @@ const commands = [];
 const log = await new Log().load();
 const path = $guild ? `guilds/${$guild}/commands` : 'commands';
 
-for await (let file of util.fsp.glob(COMMANDS_GLOB)) {
+for await (const file of util.fsp.glob(COMMANDS_GLOB)) {
     const module = await import(`file://${file}`);
 
     if (

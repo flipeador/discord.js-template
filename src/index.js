@@ -1,7 +1,7 @@
 import process from 'node:process';
 import { version, ShardingManager } from 'discord.js';
 
-import * as util from './lib/util.js';
+import * as util from '@lib/util.js';
 import { database } from './database/database.js';
 
 util.log(`pid ${process.pid} | node.js ${process.version} | discord.js ${version}`);
@@ -13,9 +13,10 @@ const manager = new ShardingManager(
         execArgv: [
             '--expose-gc',
             '--trace-warnings',
-            '--max-old-space-size=4096'
+            '--max-old-space-size=4096',
+            '--import', './register-hooks.js'
         ],
-        token: process.env.TOKEN
+        token: process.env.BOT_TOKEN
     }
 );
 
@@ -68,4 +69,4 @@ manager.on('shardCreate', shard => {
 util.log('Launching shards...');
 const shards = await manager.spawn();
 const botTag = await shards.first().fetchClientValue('user.tag');
-util.log(`Ready! Logged in as ${botTag}.`);
+util.log(`Ready! Logged in as ${botTag}`);

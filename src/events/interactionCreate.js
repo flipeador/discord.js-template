@@ -30,15 +30,17 @@
 
 import {
     Events,
+    MessageFlags,
     DiscordAPIError,
     EmbedBuilder,
     BaseInteraction, // eslint-disable-line no-unused-vars
 } from 'discord.js';
 
-import * as util from '../lib/util.js';
-import * as discord from '../lib/discord.js';
+import * as util from '@lib/util.js';
+import * as errors from '@lib/error.js';
+import * as discord from '@lib/discord.js';
 
-const OWNERS = process.env.OWNER_ID.split(',');
+const BOT_OWNER_ID = process.env.BOT_OWNER_ID;
 
 import command from './interaction/command/command.js';
 import component from './interaction/component/component.js';
@@ -52,7 +54,7 @@ export const name = Events.InteractionCreate;
  * @param {BaseInteraction} interaction
  */
 export async function execute(interaction) {
-    interaction.isOwner = OWNERS.includes(interaction.user.id);
+    interaction.isOwner = interaction.user.id === BOT_OWNER_ID;
 
     interaction._reply = interaction.reply.bind(interaction);
     interaction.reply = (...args) => discord.send(interaction, ...args);
@@ -85,7 +87,11 @@ export async function execute(interaction) {
                 ]
             });
         }
-        // Any other unexpected error.
+        // Client command interaction error.
+        else if (error instanceof errors.InteractionError) {
+            await interaction.tryReply(error.content);
+        }
+        // Any other unexpected non-falsy error.
         else if (error) {
             util.log('Interaction error:', error);
 
@@ -94,8 +100,8 @@ export async function execute(interaction) {
             if (interaction.isOwner) {
                 const message = typeof(error) === 'string' ? error : error.message;
                 await interaction.tryReply({
-                    content: util.shorten(`${message ?? error}`, 2000),
-                    ephemeral: true
+                    content: util.shorten(`${message ?? error}`, 4000),
+                    flags: MessageFlags.Ephemeral
                 });
             }
         }

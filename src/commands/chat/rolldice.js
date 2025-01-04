@@ -5,10 +5,9 @@ import {
     CommandInteraction // eslint-disable-line no-unused-vars
 } from 'discord.js';
 
-import * as util from '../../lib/util.js';
+import * as util from '@lib/util.js';
 
-// Set the command as a Global Application Command.
-// Include the command when registering global application commands.
+// Include command when registering global application commands.
 export const global = true;
 
 // Create API-compatible JSON data for the command.
@@ -54,6 +53,7 @@ export async function execute(interaction) {
     const dices = interaction.options.getInteger('dices') ?? 1;
     const sides = interaction.options.getInteger('sides') ?? 6;
 
+    // Simulation of waiting while the dice roll.
     await util.timeout(2000, 5000);
 
     // Avoid using:

@@ -5,10 +5,11 @@ import {
     TextInputBuilder,
     TextInputStyle,
     InteractionContextType,
+    ApplicationIntegrationType,
     CommandInteraction // eslint-disable-line no-unused-vars
 } from 'discord.js';
 
-import * as util from '../../lib/util.js';
+import * as util from '@lib/util.js';
 
 // Create API-compatible JSON data for the command.
 export const data = new SlashCommandBuilder()
@@ -20,6 +21,10 @@ export const data = new SlashCommandBuilder()
     .setContexts(
         InteractionContextType.Guild,
         InteractionContextType.PrivateChannel
+    )
+    .setIntegrationTypes(
+        ApplicationIntegrationType.UserInstall,
+        ApplicationIntegrationType.GuildInstall
     )
     .addUserOption(opt => opt
         .setName('target')

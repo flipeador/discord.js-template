@@ -2,7 +2,7 @@ import {
     ContextMenuCommandInteraction // eslint-disable-line no-unused-vars
 } from 'discord.js';
 
-import * as util from '../../../../lib/util.js';
+import * as util from '@lib/util.js';
 
 import user from './user/user.js';
 import message from './message/message.js';

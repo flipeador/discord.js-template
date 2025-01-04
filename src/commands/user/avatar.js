@@ -1,4 +1,5 @@
 import {
+    MessageFlags,
     EmbedBuilder,
     ContextMenuCommandBuilder,
     ApplicationCommandType,
@@ -6,6 +7,8 @@ import {
     ApplicationIntegrationType,
     UserContextMenuCommandInteraction // eslint-disable-line no-unused-vars
 } from 'discord.js';
+
+import { link } from '@lib/discord.js';
 
 // Set the command as a Global Application Command.
 // Include the command when registering global application commands.
@@ -29,17 +32,15 @@ export const data = new ContextMenuCommandBuilder()
  * @param {UserContextMenuCommandInteraction} interaction
  */
 export async function execute(interaction) {
-    const userAvatar = interaction.targetUser.avatarURL({ size: 4096 });
-    const userDisplayAvatar = interaction.targetUser.displayAvatarURL({ size: 4096 });
-    const memberAvatar = interaction.targetMember?.avatarURL?.({ size: 4096 });
-    const memberDisplayAvatar = interaction.targetMember?.displayAvatarURL?.({ size: 4096 });
+    const options = { size: 4096 };
 
-    // The user must be force fetched for this property to be present or be updated.
-    if (interaction.isOwner) {
-        await interaction.deferReply({ ephemeral: true });
-        await interaction.targetUser.fetch(true);
-    }
-    const userBanner = interaction.targetUser.bannerURL({ size: 4096 });
+    const userAvatar = interaction.targetUser.avatarURL(options);
+    const memberAvatar = interaction.targetMember?.avatarURL?.(options);
+    const userBanner = interaction.targetUser.bannerURL(options);
+    const memberBanner = interaction.targetMember?.bannerURL?.(options);
+
+    const userDisplayAvatar = interaction.targetUser.displayAvatarURL(options);
+    const memberDisplayAvatar = interaction.targetMember?.displayAvatarURL?.(options);
 
     await interaction.reply({
         embeds: [
@@ -50,13 +51,14 @@ export async function execute(interaction) {
                     iconURL: userDisplayAvatar
                 },
                 description:
-                    `[User avatar](${userAvatar})` +
-                    (userBanner ? ` | [User banner](${userBanner})` : '') +
-                    (memberAvatar ? ` | [Member avatar](${memberAvatar})` : ''),
+                    link('User avatar', userAvatar) +
+                    (memberAvatar ? ` | [Member avatar](${memberAvatar})` : '') +
+                    (userBanner ? ` | ${link('User banner', userBanner)}` : '') +
+                    (memberBanner ? ` | ${link('Member banner', memberBanner)}` : ''),
                 image: { url: memberDisplayAvatar || userDisplayAvatar },
                 footer: { text: `ID:⠀${interaction.targetUser.id}` }
             })
         ],
-        ephemeral: true
+        flags: MessageFlags.Ephemeral
     });
 }

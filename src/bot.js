@@ -1,5 +1,5 @@
 import process from 'node:process';
-import * as util from './lib/util.js';
+import * as util from '@lib/util.js';
 import { Client, GatewayIntentBits } from 'discord.js';
 
 const ROOT = import.meta.dirname;
@@ -114,4 +114,4 @@ class Bot {
 
 const bot = new Bot();
 await bot.registerEvents();
-bot.client.login(process.env.TOKEN);
+bot.client.login(process.env.BOT_TOKEN);
