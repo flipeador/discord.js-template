@@ -125,7 +125,7 @@ The following table specifies all available application commands that serve as e
 | [`/eval`](src/commands/chat/eval.js) | Chat input | Server | `user` `guild` | `owner` `modal` |
 | [`/rps`](src/commands/chat/rps.js) | Chat input | Global | `user` `guild` | `fun` `game` |
 | [`/guess`](src/commands/chat/guess.js) | Chat input | Global | `guild` | `fun` `game` |
-| [`/blackjack`](src/commands/chat/blackjack.js) | Chat input | Global | `guild` | `fun` `game` |
+| [`/blackjack`](src/commands/chat/blackjack.js) | Chat input | Global | `user` `guild` | `fun` `game` |
 | [`/rolldice`](src/commands/chat/rolldice.js) | Chat input | Global | `user` `guild` | `fun` |
 | [`Get avatar`](src/commands/user/avatar.js) | User context menu | Global | `user` `guild` | `embed` |
 
