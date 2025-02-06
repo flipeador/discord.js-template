@@ -10,12 +10,12 @@ Currently, the module is loaded but the database is not used.
 
 # Instructions
 
-Create a Discord bot application, see [Discord.js Guide - Setting up a bot application][setup].
+Create a Discord bot application ([Discord.js Guide - Setting up a bot application][setup]).
 
 > 🤖 Generate an invite link for your application.
 >
 > 1. Navigate to [Discord Developers - Applications][apps].
-> 2. Scroll down and select your app, copy the **Application ID**.
+> 2. Scroll down and select your app. Copy the **Application ID**.
 > 3. Go to `⚙️ Installation` and select both [installation contexts][insctx].
 > 4. Replace `000000000000000000` with your app ID in the URLs below.
 >
@@ -80,10 +80,10 @@ Rename [`.sample.env`](.sample.env) to `.env`, and configure the required fields
 Run the following commands to register application commands and start the bot:
 
 ```ps1
-# Register all commands in the test server.
+# Register all application commands in the test server.
 node --run reg -- bulk ALL TEST
 
-# Start the bot and log in to Discord.
+# Start the bot application and log in to Discord.
 node --run bot
 ```
 
@@ -157,7 +157,7 @@ This project is licensed under the **GNU General Public License v3.0**.
 See the [license file](LICENSE) for details.
 
 <!-- Footnotes -->
-[^1]: [Node.js ≥23.5][v2350] is required for [`node:module registerHooks`][node-chooks] ([`register-hooks.js`](register-hooks.js)).
+[^1]: [Node.js ≥23.5][v2350] is required for [`node:module registerHooks`][node-chooks] ([`register-hooks.js`](./register-hooks.js)).
 [^2]: Starting with [Node.js 23.4][v2340], the [`node:sqlite`][node-sqlite] module can be used without the `--experimental-sqlite` CLI flag.
 [^3]: [YouTube — PSA: Discord added a New Raid and Scamming Method... (@NoTextToSpeech)](https://youtu.be/6vjG34uyPz0)
 
