@@ -157,7 +157,7 @@ This project is licensed under the **GNU General Public License v3.0**.
 See the [license file](LICENSE) for details.
 
 <!-- Footnotes -->
-[^1]: [Node.js ≥23.5][v2350] is required for [`node:module registerHooks`][node-chooks] ([`register-hooks.js`](./register-hooks.js)).
+[^1]: [Node.js ≥23.5][v2350] is required for [`node:module registerHooks`][node-chooks] ([`register-hooks.js`](register-hooks.js)).
 [^2]: Starting with [Node.js 23.4][v2340], the [`node:sqlite`][node-sqlite] module can be used without the `--experimental-sqlite` CLI flag.
 [^3]: [YouTube — PSA: Discord added a New Raid and Scamming Method... (@NoTextToSpeech)](https://youtu.be/6vjG34uyPz0)
 
