@@ -106,7 +106,7 @@ export class RPS extends Game {
                 this.players.set(new Player(this.botUser, weapons.randomKey()));
 
             // Wait for players to choose a weapon (3 minutes).
-            if (!await this.awaitMessageComponent2({ time: 3 * 60 * 1000 }))
+            if (!await this.awaitMessageComponent({ time: 3 * 60 * 1000 }))
                 await this.abort('Players have not responded in time.');
 
             const [first, second] = this.players.values();
