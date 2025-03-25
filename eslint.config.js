@@ -1,6 +1,8 @@
 // ESLint Flat Configuration File.
 // https://eslint.org/docs/latest/use/configure/configuration-files
 
+import { defineConfig } from 'eslint/config';
+
 // Tool for inspecting ESLint flat configs.
 // https://github.com/eslint/config-inspector
 // pnpm dlx @eslint/config-inspector
@@ -13,12 +15,10 @@ import globals from 'globals';
 // https://eslint.style/packages/default
 import stylistic from '@stylistic/eslint-plugin';
 
-export default [
+export default defineConfig(
     {
         languageOptions: {
-            globals: {
-                ...globals.node
-            }
+            globals: globals.node
         },
         plugins: {
            '@stylistic': stylistic
@@ -90,4 +90,4 @@ export default [
             '@stylistic/switch-colon-spacing': 'error'
         }
     }
-];
+);
