@@ -16,12 +16,18 @@
     "discord.js": "^14.18.0"
   },
   "devDependencies": {
-    "@stylistic/eslint-plugin": "^4.0.1",
-    "eslint": "^9.21.0",
+    "@stylistic/eslint-plugin": "^4.2.0",
+    "eslint": "^9.23.0",
     "globals": "^16.0.0"
   },
   "engines": {
     "node": ">=23.5",
     "pnpm": ">=10"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "bufferutil",
+      "utf-8-validate"
+    ]
   }
 }
