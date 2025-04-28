@@ -13,11 +13,11 @@
   },
   "dependencies": {
     "bufferutil": "^4.0.9",
-    "discord.js": "^14.18.0"
+    "discord.js": "^14.19.1"
   },
   "devDependencies": {
     "@stylistic/eslint-plugin": "^4.2.0",
-    "eslint": "^9.23.0",
+    "eslint": "^9.25.1",
     "globals": "^16.0.0"
   },
   "engines": {
