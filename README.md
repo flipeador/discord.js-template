@@ -29,7 +29,7 @@ Create a Discord bot application ([Discord.js Guide - Setting up a bot applicati
 > https://discord.com/oauth2/authorize?client_id=000000000000000000&integration_type=1&scope=applications.commands
 > ```
 > Adding the bot application to your user account allows its use even on servers where it is not installed. \
-> If the server has the `Use External Apps` permission disabled, the bot's messages will only be visible to the invoker. [^3]
+> The bot's messages will be ephemeral if the invoker has the `Use External Apps` permission disabled. [^3]
 
 Before starting up the bot, you will need to install and configure a few things.
 
@@ -124,10 +124,10 @@ The following table specifies all available application commands that serve as e
 | --- | --- | --- | --- | --- |
 | [`/eval`](src/commands/chat/eval.js) | Chat input | Server | `user` `guild` | `owner` `modal` |
 | [`/rps`](src/commands/chat/rps.js) | Chat input | Global | `user` `guild` | `fun` `game` |
-| [`/guess`](src/commands/chat/guess.js) | Chat input | Global | `guild` | `fun` `game` |
+| [`/guess`](src/commands/chat/guess.js) | Chat input | Global | `guild` | `fun` `game` [`CV2`][compv2] |
 | [`/blackjack`](src/commands/chat/blackjack.js) | Chat input | Global | `user` `guild` | `fun` `game` |
-| [`/rolldice`](src/commands/chat/rolldice.js) | Chat input | Global | `user` `guild` | `fun` |
-| [`Get avatar`](src/commands/user/avatar.js) | User context menu | Global | `user` `guild` | `embed` |
+| [`/rolldice`](src/commands/chat/rolldice.js) | Chat input | Global | `user` `guild` | `fun` [`CV2`][compv2] |
+| [`Get avatar`](src/commands/user/avatar.js) | User context menu | Global | `user` `guild` | `util` `embed` |
 
 The integration types defines the contexts where the command is available, only for globally-scoped commands:
 
@@ -135,6 +135,41 @@ The integration types defines the contexts where the command is available, only 
 | --- | --- |
 | [`user`][userctx] | The command is visible to users who have installed the application on their account. |
 | [`guild`][servctx] (Server) | The command is visible to all members of the server where the application is installed. |
+
+> [!NOTE]
+> Ephemeral messages are only visible to the user who invoked the interaction.
+>
+> ```js
+> import { MessageFlags } from 'discord.js';
+> export async function execute(interaction) {
+>     const response = await interaction.reply({
+>         content: 'Initial reply',
+>         flags: MessageFlags.Ephemeral,
+>         withResponse: true
+>     });
+>
+>     // You can use `<CommandInteraction>.editReply` to edit the initial ephemeral reply.
+>     await interaction.editReply({ content: 'The new content for the initial reply!!' });
+>
+>     // But `<InteractionCallbackResponse>.resource` is `undefined` for ephemeral replies.
+>     await response.resource.message.edit({ content: 'This line will throw an error!!' });
+> }
+> ```
+
+> [!TIP]
+> Disallow a command to run in a channel where all messages are forced ephemeral:
+> ```js
+> import { UserError } from '@lib/error.js';
+> import { PermissionFlagsBits } from 'discord.js';
+> export async function execute(interaction) {
+>     // If the command is invoked in a guild where the app is not installed,
+>     // and the "Use External Apps" permission is disabled for the invoker.
+>     if (
+>         !interaction.appPermissions.has(PermissionFlagsBits.ViewChannel) &&
+>         !interaction.memberPermissions.has(PermissionFlagsBits.UseExternalApps)
+>     ) throw new UserError('This command cannot be invoked on this channel.');
+> }
+> ```
 
 > [!TIP]
 > To close all connections gracefully and terminate the main process:
@@ -173,7 +208,7 @@ See the [license file](LICENSE) for details.
 [pnpm]: https://pnpm.io/installation
 [sqlite]: https://sqlite.org
 
-[terminal]: https://docs.microsoft.com/windows/terminal
+[terminal]: https://learn.microsoft.com/en-us/windows/terminal
 
 [code]: https://code.visualstudio.com
 [code-terminal]: https://code.visualstudio.com/docs/terminal/basics
@@ -182,6 +217,8 @@ See the [license file](LICENSE) for details.
 
 [apps]: https://discord.com/developers/applications
 [insctx]: https://discord.com/developers/docs/resources/application#installation-context
+[compv2]: https://discord.com/developers/docs/change-log/2025-04-22-components-v2 "Components v2"
+[compref]: https://discord.com/developers/docs/components/reference "Component Reference"
 [userctx]: https://discord.com/developers/docs/resources/application#user-context
 [servctx]: https://discord.com/developers/docs/resources/application#server-context
 [regcmds]: https://discord.com/developers/docs/tutorials/upgrading-to-application-commands#registering-commands
