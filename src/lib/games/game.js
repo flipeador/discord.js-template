@@ -13,9 +13,37 @@ import {
     PermissionFlagsBits
 } from 'discord.js';
 
+import * as util from '@lib/util.js';
 import { UserError } from '@lib/error.js';
 import { Throttle } from '@lib/throttle.js';
 import { link, syncFilter } from '@lib/discord.js';
+
+/**
+ * Standard 52-card deck: 1-10, Jack, Queen, King.
+ */
+export class CardDeck52 {
+    constructor() {
+        this.deck = [
+            '1♣', '2♣', '3♣', '4♣', '5♣', '6♣', '7♣', '8♣', '9♣', '10♣', 'J♣', 'Q♣', 'K♣', // clubs
+            '1♦', '2♦', '3♦', '4♦', '5♦', '6♦', '7♦', '8♦', '9♦', '10♦', 'J♦', 'Q♦', 'K♦', // diamonds
+            '1♥', '2♥', '3♥', '4♥', '5♥', '6♥', '7♥', '8♥', '9♥', '10♥', 'J♥', 'Q♥', 'K♥', // hearts
+            '1♠', '2♠', '3♠', '4♠', '5♠', '6♠', '7♠', '8♠', '9♠', '10♠', 'J♠', 'Q♠', 'K♠', // spades
+        ];
+    }
+
+    /**
+     * Choose cards and remove them from the deck.
+     * @param {number} count The amount of cards to choose.
+     * @returns {{name:string,value:number}[]}
+     */
+    withdraw(count, j = 11, q = 12, k = 13) {
+        return Array.from({ length: count }, () => {
+            const name = util.choise(this.deck, true);
+            const name2 = util.replace(name, ['J', j], ['Q', q], ['K', k]);
+            return { name, value: parseInt(name2, 10) };
+        });
+    }
+}
 
 export class Player {
     /** @type {User} */ user;
@@ -415,17 +443,5 @@ export class Game {
      */
     get opponents() {
         return this.players.toString(player => player.user.id !== this.interaction.user.id);
-    }
-
-    /**
-     * Create a standard 52-card deck: 1-10, Jack, Queen, King.
-     */
-    static createCardDeck52() {
-        return [
-            '1♣', '2♣', '3♣', '4♣', '5♣', '6♣', '7♣', '8♣', '9♣', '10♣', 'J♣', 'Q♣', 'K♣', // clubs
-            '1♦', '2♦', '3♦', '4♦', '5♦', '6♦', '7♦', '8♦', '9♦', '10♦', 'J♦', 'Q♦', 'K♦', // diamonds
-            '1♥', '2♥', '3♥', '4♥', '5♥', '6♥', '7♥', '8♥', '9♥', '10♥', 'J♥', 'Q♥', 'K♥', // hearts
-            '1♠', '2♠', '3♠', '4♠', '5♠', '6♠', '7♠', '8♠', '9♠', '10♠', 'J♠', 'Q♠', 'K♠', // spades
-        ];
     }
 }
