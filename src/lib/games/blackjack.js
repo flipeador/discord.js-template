@@ -6,8 +6,8 @@ import {
     ButtonInteraction // eslint-disable-line no-unused-vars
 } from 'discord.js';
 
-import { Game } from './game.js';
 import * as util from '@lib/util.js';
+import { CardDeck52, Game } from './game.js';
 
 /**
  * Blackjack game.
@@ -18,7 +18,7 @@ export class Blackjack extends Game {
 
     async main() {
         await this.initialize(() => {
-            this.cardDeck = Game.createCardDeck52();
+            this.cardDeck52 = new CardDeck52();
             this.players.reset(() => ({ cards: '', score: 0 }));
 
             return {
@@ -59,15 +59,17 @@ export class Blackjack extends Game {
      * Request a card from the deck.
      */
     async hit() {
-        const cardName = util.choise(this.cardDeck, true);
-        let cardValue = Number(cardName.slice(0, -1).replace('J', 10).replace('Q', 10).replace('K', 10));
+        const [card] = this.cardDeck52.withdraw(1, 10, 10, 10);
 
-        if (cardValue === 1) { // ace => 1 or 11
+        if (card.value === 1) { // ace => 1 or 11
             if (this.players.current.user.bot)
-                cardValue = this.players.current.data.score > 10 ? 1 : 11;
+                card.value = this.players.current.data.score > 10 ? 1 : 11;
             else {
                 await this.interaction.editReply({
-                    embeds: this.getEmbeds(this.players.current, `You got an Ace (${cardName}), choose a value.`),
+                    embeds: this.getEmbeds(
+                        this.players.current,
+                        `You got an Ace (${card.name}), choose a value.`
+                    ),
                     components: [
                         new ActionRowBuilder().addComponents(
                             new ButtonBuilder()
@@ -81,12 +83,12 @@ export class Blackjack extends Game {
                         )
                     ]
                 });
-                cardValue = Number(await this.awaitMessageComponent2());
+                card.value = Number(await this.awaitMessageComponent2());
             }
         }
 
-        this.players.current.data.cards = `${this.players.current.data.cards} ${cardName}`.trim();
-        this.players.current.data.score += cardValue;
+        this.players.current.data.cards = `${this.players.current.data.cards} ${card.name}`.trim();
+        this.players.current.data.score += card.value;
 
         // If both players obtained the maximum score of 21, it is a tie.
         if (this.players.current.data.score === 21 && this.players.other.data.score === 21)
