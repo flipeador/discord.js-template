@@ -1,4 +1,6 @@
 import {
+    MessageFlags,
+    ContainerBuilder,
     SlashCommandBuilder,
     InteractionContextType,
     ApplicationIntegrationType,
@@ -46,26 +48,30 @@ export const data = new SlashCommandBuilder()
  * @param {CommandInteraction} interaction
  */
 export async function execute(interaction) {
-    await interaction.reply({
+    const container = new ContainerBuilder();
+
+    const options = {
+        components: [ container ],
+        flags: MessageFlags.IsComponentsV2
+    };
+
+    container.addTextDisplayComponents({
         content: '⌛⠀Rolling the dice ...'
     });
+
+    await interaction.reply(options);
+    await util.timeout(3000, 5000);
 
     const dices = interaction.options.getInteger('dices') ?? 1;
     const sides = interaction.options.getInteger('sides') ?? 6;
 
-    // Simulation of waiting while the dice roll.
-    await util.timeout(2000, 5000);
+    container.addSeparatorComponents({ /* small spacing */ });
 
-    // Avoid using:
-    //   const reply = await interaction.reply({ fetchReply: true });
-    //   await reply.edit(...);
-    // The above code might throw 'ChannelNotCached' for user apps if
-    // the command is invoked in a server where the bot is not in.
-    // https://github.com/discordjs/discord.js/issues/10441
-    await interaction.editReply(
-        Array.from(
-            { length: dices },
-            () => `🎲⠀${util.random(1, sides)}`
-        ).join('\n')
+    container.addTextDisplayComponents(
+        Array.from({ length: dices }, () => ({
+            content: `🎲⠀${util.random(1, sides)}`
+        }))
     );
+
+    await interaction.editReply(options);
 }

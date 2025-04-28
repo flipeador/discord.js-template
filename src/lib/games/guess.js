@@ -1,12 +1,14 @@
 import {
     Message, // eslint-disable-line no-unused-vars
     MessageFlags,
-    EmbedBuilder,
+    ContainerBuilder,
+    TextDisplayBuilder,
     CommandInteraction // eslint-disable-line no-unused-vars
 } from 'discord.js';
 
 import { Game } from './game.js';
 import * as util from '@lib/util.js';
+import * as discord from '@lib/discord.js';
 import { UserError } from '@lib/error.js';
 
 export class Guess extends Game {
@@ -31,23 +33,34 @@ export class Guess extends Game {
         if (this.time < 10_000 || this.time > 600_000)
             throw new UserError('The duration must be between 10 seconds and 10 minutes.');
 
-        // Respond with an ephemeral message to avoid disclosing the secret.
-        await this.interaction.reply({ content: '✅', flags: MessageFlags.Ephemeral });
-
-        // Create a Unix timestamp, in seconds.
+        const container = new ContainerBuilder();
         const timestamp = Math.floor((Date.now() + this.time) / 1000);
 
+        // Respond with an ephemeral message to avoid disclosing the secret.
+        await this.interaction.reply({
+            components: [
+                container.addTextDisplayComponents({ content: '✅' })
+            ],
+            flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2
+        });
+
+        // Follow up with a message announcing the game, visible to all members.
         this.message = await this.interaction.followUp({
-            embeds: [
-                new EmbedBuilder({
-                    title: '❓⠀Guessing game!',
-                    description:
-                        `Guess the word or phrase ${this.challenger} is thinking.` +
-                        `\nMention ${this.botUser} and write your answer in this channel.` +
-                        `\n\n⌛⠀Ends <t:${timestamp}:R>.`, // styled Unix timestamp (relative time)
-                    fields: this.hint ? [{ name: '💡⠀Hint', value: this.hint }] : []
-                })
-            ]
+            components: [
+                container.spliceComponents(0, 1,
+                    new TextDisplayBuilder({
+                        content: util.stripIndents(`
+                            # ❓⠀Guessing game!
+                            Guess the word or phrase ${this.challenger} is thinking.
+                            Mention ${this.botUser} and write your answer in this channel.
+                            ### 💡⠀Hint
+                            ${this.hint}\n
+                            -# ⌛⠀Ends <t:${timestamp}:R>.
+                        `)
+                    })
+                )
+            ],
+            flags: MessageFlags.IsComponentsV2
         });
 
         // Start collecting messages.
@@ -55,15 +68,23 @@ export class Guess extends Game {
             .then(messages => messages?.first?.()); // single message
 
         await this.message.reply({
-            embeds: [
-                new EmbedBuilder({
-                    title: message ? '🏆⠀Winner!' : '⏰⠀Timeout',
-                    description: message ?
-                        `${message.author} got the [correct answer](${message.url})!` :
-                        'No one has responded in time.',
-                    fields: [{ name: 'Answer', value: this.secret }]
-                })
-            ]
+            components: [
+                container.spliceComponents(0, 1,
+                    new TextDisplayBuilder({
+                        content: util.stripIndents(`
+                            ## ${message ? '🏆⠀Winner!' : '⏰⠀Timeout'}
+                            ${
+                                message ?
+                                `${message.author} got the [correct answer](<${message.url}>)!` :
+                                'No one has responded in time.'
+                            }
+                            ### Answer
+                            ${discord.escape(this.secret)}
+                        `)
+                    })
+                )
+            ],
+            flags: MessageFlags.IsComponentsV2
         });
     }
 
@@ -75,7 +96,8 @@ export class Guess extends Game {
     filter(message) {
         return message.content.toLowerCase()
             // Remove all mentions.
-            // User mentions with an exclamation mark are deprecated.
+            //
+            // Note: User mentions with an exclamation mark are deprecated.
             // https://discord.com/developers/docs/reference#message-formatting
             .replace(/<@!?\d+>/g, '')
             .trim().startsWith(this.answer);
