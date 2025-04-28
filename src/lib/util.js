@@ -6,6 +6,7 @@ import crypto from 'node:crypto';
 export { fs, fsp };
 export const node = util;
 
+// https://github.com/nodejs/help/issues/1808
 export const AsyncFunction = async function () {}.constructor;
 
 export function log(...args) {
@@ -28,10 +29,23 @@ export function log(...args) {
  * @param {string} suffix
  * @returns {string}
  */
-export function shorten(str, limit, suffix='...') {
+export function shorten(str, limit, suffix='…') {
     if (limit >= str.length) return str;
     if (limit < suffix.length) return '';
     return str.slice(0, limit-suffix.length) + suffix;
+}
+
+/**
+ * Replace text in a string based on provided pairs of substrings and values.
+ * @param {string} str
+ */
+export function replace(str, ...pairs) {
+    let lkv; // last known value
+    pairs.forEach(([substr, value], i) => {
+        lkv = value ?? lkv ?? pairs[i-1][1];
+        str = str.replace(substr, lkv);
+    });
+    return str;
 }
 
 /**

@@ -8,8 +8,6 @@ import {
     UserContextMenuCommandInteraction // eslint-disable-line no-unused-vars
 } from 'discord.js';
 
-import { link } from '@lib/discord.js';
-
 // Set the command as a Global Application Command.
 // Include the command when registering global application commands.
 export const global = true;
@@ -35,9 +33,9 @@ export async function execute(interaction) {
     const options = { size: 4096 };
 
     const userAvatar = interaction.targetUser.avatarURL(options);
-    const memberAvatar = interaction.targetMember?.avatarURL?.(options);
     const userBanner = interaction.targetUser.bannerURL(options);
     const memberBanner = interaction.targetMember?.bannerURL?.(options);
+    const memberAvatar = interaction.targetMember?.avatarURL?.(options);
 
     const userDisplayAvatar = interaction.targetUser.displayAvatarURL(options);
     const memberDisplayAvatar = interaction.targetMember?.displayAvatarURL?.(options);
@@ -46,15 +44,15 @@ export async function execute(interaction) {
         embeds: [
             new EmbedBuilder({
                 author: {
-                    name: interaction.targetUser.tag,
                     url: userDisplayAvatar,
-                    iconURL: userDisplayAvatar
+                    iconURL: userDisplayAvatar,
+                    name: interaction.targetUser.tag
                 },
                 description:
-                    link('User avatar', userAvatar) +
-                    (memberAvatar ? ` | [Member avatar](${memberAvatar})` : '') +
-                    (userBanner ? ` | ${link('User banner', userBanner)}` : '') +
-                    (memberBanner ? ` | ${link('Member banner', memberBanner)}` : ''),
+                    (userAvatar ? `[User avatar](<${userAvatar}>)` : '') +
+                    (userBanner ? ` | [User banner](<${userBanner}>)` : '') +
+                    (memberAvatar ? ` | [Member avatar](<${memberAvatar}>)` : '') +
+                    (memberBanner ? ` | [Member banner](<${memberBanner}>)` : ''),
                 image: { url: memberDisplayAvatar || userDisplayAvatar },
                 footer: { text: `ID:⠀${interaction.targetUser.id}` }
             })

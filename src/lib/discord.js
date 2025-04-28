@@ -1,3 +1,5 @@
+import { escapeMarkdown } from 'discord.js';
+
 import * as util from '@lib/util.js';
 
 export async function trySend(target, ...args) {
@@ -68,4 +70,18 @@ export function syncFilter(filter) {
             return result = !!await filter(interaction);
         });
     };
+}
+
+/**
+ * Escapes any Discord-flavored markdown in a string.
+ * @param {string} text
+ * @returns {string}
+ * @see https://discord.js.org/docs/packages/discord.js/main/escapeMarkdown:Function
+ */
+export function escape(text, options={}) {
+    options.heading ??= true;
+    options.maskedLink ??= true;
+    options.numberedList ??= true;
+    options.bulletedList ??= true;
+    return escapeMarkdown(text, options);
 }
