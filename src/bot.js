@@ -44,25 +44,26 @@ class Bot {
      * Creates a unique temporary ID.
      * @param {object} data
      * The data to associate with the ID.
+     * @param {string} [data.id]
+     * If not specified, a new unique ID is generated.
      * @param {string} [data.module]
      * The name of a file used to handle component and modal events. \
-     * Search for `module?.endsWith` to find all files that check this key. \
-     * For example, the [`/eval`](commands/chat/eval.js) slash command uses it for a modal.
+     * Search for `module?.endsWith` to find all files that check this key.
      * @param {number} [timeout=600000]
      * The number of milliseconds to wait before the ID expires.
      */
     createId(data, timeout=600000) {
-        const id = `${this.#id++}`;
-        this.#ids.set(id, data);
+        data.id ??= `${this.#id++}`;
+        this.#ids.set(data.id, data);
         data[$TIMER] = setTimeout(
             () => {
                 delete data[$TIMER];
-                this.#ids.delete(id);
+                this.#ids.delete(data.id);
                 data.reject?.(new Error('Timeout'));
             },
             timeout
         );
-        return id;
+        return data.id;
     }
 
     /**

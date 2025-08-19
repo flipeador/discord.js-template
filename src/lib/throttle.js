@@ -69,8 +69,7 @@ export class Throttle {
 
         this.timer = setTimeout(
             () => {
-                if (!Promise.try?.(this.func, ...this.args)?.then?.(this.resolve, this.reject))
-                    new Promise(r => r(this.func(...this.args))).then(this.resolve, this.reject);
+                Promise.try(this.func, ...this.args).then(this.resolve, this.reject);
                 this.clear(undefined, Date.now());
             },
             remaining

@@ -1,11 +1,11 @@
 # Discord.js Template
 
-A basic Discord bot application template using [Node.js ≥23.5][v2350][^1] and [Discord.js][djs] v14.
+A basic Discord bot application template using [Node.js ≥24][v2340][^1] and [Discord.js][djs] v14.
 
 The template uses the [Discord.js][djs] built-in `ShardingManager` to run shards in [separate processes][node-ipc]. \
 Although [sharding][sharding] is only required at 2500 guilds, doing so in advance should not be a problem.
 
-The [native `node:sqlite` module][node-sqlite] added in [Node.js 22.5][v2250][^2] is used for the [SQLite][sqlite] database. \
+The [native `node:sqlite` module][node-sqlite] added in [Node.js 22.5][v2250] is used for the [SQLite][sqlite] database. \
 Currently, the module is loaded but the database is not used.
 
 # Instructions
@@ -29,7 +29,7 @@ Create a Discord bot application ([Discord.js Guide - Setting up a bot applicati
 > https://discord.com/oauth2/authorize?client_id=000000000000000000&integration_type=1&scope=applications.commands
 > ```
 > Adding the bot application to your user account allows its use even on servers where it is not installed. \
-> The bot's messages will be ephemeral if the invoker has the `Use External Apps` permission disabled. [^3]
+> The bot's messages will be ephemeral if the invoker has the `Use External Apps` permission disabled. [^2]
 
 Before starting up the bot, you will need to install and configure a few things.
 
@@ -192,18 +192,15 @@ This project is licensed under the **GNU General Public License v3.0**.
 See the [license file](LICENSE) for details.
 
 <!-- Footnotes -->
-[^1]: [Node.js ≥23.5][v2350] is required for [`node:module registerHooks`][node-chooks] ([`register-hooks.js`](register-hooks.js)).
-[^2]: Starting with [Node.js 23.4][v2340], the [`node:sqlite`][node-sqlite] module can be used without the `--experimental-sqlite` CLI flag.
-[^3]: [YouTube — PSA: Discord added a New Raid and Scamming Method... (@NoTextToSpeech)](https://youtu.be/6vjG34uyPz0)
+[^1]: [Node.js ≥24][v2340] is required for `Error.isError` and `Promise.try`.
+[^2]: [YouTube — PSA: Discord added a New Raid and Scamming Method... (@NoTextToSpeech)](https://youtu.be/6vjG34uyPz0)
 
 <!-- Reference Links -->
 [node]: https://nodejs.org
 [node-sqlite]: https://nodejs.org/api/sqlite.html
-[node-chooks]: https://nodejs.org/api/module.html#customization-hooks
 [node-ipc]: https://nodejs.org/api/child_process.html#class-childprocess
 [v2250]: https://nodejs.org/en/blog/release/v22.5.0
-[v2340]: https://nodejs.org/en/blog/release/v23.4.0
-[v2350]: https://nodejs.org/en/blog/release/v23.5.0
+[v2340]: https://nodejs.org/en/blog/release/v24.0.0
 
 [pnpm]: https://pnpm.io/installation
 [sqlite]: https://sqlite.org

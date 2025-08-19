@@ -12,16 +12,17 @@
     "lint:ci": "pnpm dlx @eslint/config-inspector"
   },
   "dependencies": {
+    "@js-temporal/polyfill": "^0.5.1",
     "bufferutil": "^4.0.9",
-    "discord.js": "^14.19.1"
+    "discord.js": "^14.21.0"
   },
   "devDependencies": {
-    "@stylistic/eslint-plugin": "^4.2.0",
-    "eslint": "^9.25.1",
-    "globals": "^16.0.0"
+    "@stylistic/eslint-plugin": "^5.2.3",
+    "eslint": "^9.33.0",
+    "globals": "^16.3.0"
   },
   "engines": {
-    "node": ">=23.5",
+    "node": ">=24",
     "pnpm": ">=10"
   },
   "pnpm": {

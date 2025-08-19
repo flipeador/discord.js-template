@@ -95,7 +95,7 @@ export class RPS extends Game {
     async main() {
         await this.initialize(() => ({
             embeds: this.getEmbeds(),
-            components: this.getComponents()
+            components: RPS.getComponents()
         }));
 
         for (let i = 0; i < 3; ++i) {
@@ -143,7 +143,7 @@ export class RPS extends Game {
     async update(info, end) {
         await this.interaction.editReply({
             embeds: this.getEmbeds(info, end),
-            components: end ? [] : this.getComponents()
+            components: end ? [] : RPS.getComponents()
         });
     }
 
@@ -183,7 +183,7 @@ export class RPS extends Game {
     /**
      * Get the components for the message.
      */
-    getComponents() {
+    static getComponents() {
         return [
             new ActionRowBuilder().addComponents(
                 new ButtonBuilder()

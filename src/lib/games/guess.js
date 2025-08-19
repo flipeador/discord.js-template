@@ -2,7 +2,6 @@ import {
     Message, // eslint-disable-line no-unused-vars
     MessageFlags,
     ContainerBuilder,
-    TextDisplayBuilder,
     CommandInteraction // eslint-disable-line no-unused-vars
 } from 'discord.js';
 
@@ -26,29 +25,22 @@ export class Guess extends Game {
 
     async main() {
         this.answer = this.secret.toLowerCase();
-        this.time = util.duration(this.timeout ?? '10m');
+        const time = util.duration(this.timeout ?? '10m');
+        const timestamp = Math.floor((Date.now() + time) / 1000);
 
-        if (isNaN(this.time))
+        if (isNaN(time))
             throw new UserError('The date format provided is invalid.');
-        if (this.time < 10_000 || this.time > 600_000)
+        if (time < 10_000 || time > 600_000)
             throw new UserError('The duration must be between 10 seconds and 10 minutes.');
 
-        const container = new ContainerBuilder();
-        const timestamp = Math.floor((Date.now() + this.time) / 1000);
-
         // Respond with an ephemeral message to avoid disclosing the secret.
-        await this.interaction.reply({
-            components: [
-                container.addTextDisplayComponents({ content: '✅' })
-            ],
-            flags: MessageFlags.Ephemeral | MessageFlags.IsComponentsV2
-        });
+        await this.interaction.reply({ content: '✅', flags: MessageFlags.Ephemeral });
 
         // Follow up with a message announcing the game, visible to all members.
         this.message = await this.interaction.followUp({
             components: [
-                container.spliceComponents(0, 1,
-                    new TextDisplayBuilder({
+                new ContainerBuilder()
+                    .addTextDisplayComponents({
                         content: util.stripIndents(`
                             # ❓⠀Guessing game!
                             Guess the word or phrase ${this.challenger} is thinking.
@@ -58,19 +50,18 @@ export class Guess extends Game {
                             -# ⌛⠀Ends <t:${timestamp}:R>.
                         `)
                     })
-                )
             ],
             flags: MessageFlags.IsComponentsV2
         });
 
         // Start collecting messages.
-        const message = await this.awaitMessages({ time: this.time })
+        const message = await this.awaitMessages({ time })
             .then(messages => messages?.first?.()); // single message
 
         await this.message.reply({
             components: [
-                container.spliceComponents(0, 1,
-                    new TextDisplayBuilder({
+                new ContainerBuilder()
+                    .addTextDisplayComponents({
                         content: util.stripIndents(`
                             ## ${message ? '🏆⠀Winner!' : '⏰⠀Timeout'}
                             ${
@@ -82,7 +73,6 @@ export class Guess extends Game {
                             ${discord.escape(this.secret)}
                         `)
                     })
-                )
             ],
             flags: MessageFlags.IsComponentsV2
         });
@@ -99,7 +89,6 @@ export class Guess extends Game {
             //
             // Note: User mentions with an exclamation mark are deprecated.
             // https://discord.com/developers/docs/reference#message-formatting
-            .replace(/<@!?\d+>/g, '')
-            .trim().startsWith(this.answer);
+            .replace(/<@!?\d+>/g, '').trim().startsWith(this.answer);
     }
 }

@@ -19,7 +19,7 @@ export const data = new SlashCommandBuilder()
         ApplicationIntegrationType.UserInstall,
         ApplicationIntegrationType.GuildInstall
     )
-    .addUserOption(opt => opt
+    .addUserOption(_ => _
         .setName('p2')
         .setDescription('Player #2')
     );

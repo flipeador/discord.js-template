@@ -26,14 +26,14 @@ export const data = new SlashCommandBuilder()
         ApplicationIntegrationType.UserInstall,
         ApplicationIntegrationType.GuildInstall
     )
-    .addUserOption(opt => opt
+    .addUserOption(_ => _
         .setName('target')
         .setDescription('Mention a member')
         .setDescriptionLocalizations({
             'es-ES': 'Menciona a un miembro'
         })
     )
-    .addBooleanOption(opt => opt
+    .addBooleanOption(_ => _
         .setName('ephemeral')
         .setDescription('Whether the reply should be ephemeral')
         .setDescriptionLocalizations({

@@ -60,11 +60,19 @@ export function stripIndents(str) {
     return str.map(s => s.slice(indent)).join('\n');
 }
 
+/**
+ * Check if a string has only letters.
+ * @param {string} str
+ */
+export function isLetter(str) {
+    return !/[^\p{Letter}\p{Mark}]+/gu.test(str);
+}
+
 export function serialize(value, space) {
     return JSON.stringify(
         value,
         (_, value) => {
-            if (value instanceof Error)
+            if (Error.isError(value))
                 return Object.assign(
                     {
                         name: value.name,
@@ -132,9 +140,14 @@ export function choise(array, remove) {
     return array.splice(index, 1)[0];
 }
 
+/**
+ * @param {number} min
+ * @param {number} [max]
+ * @returns {Promise<number>}
+ */
 export function timeout(min, max) {
     const ms = max === undefined ? min : random(min, max);
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise(r => setTimeout(() => r(Date.now()), ms));
 }
 
 /**
@@ -171,4 +184,35 @@ export async function load(path, defval) {
 export async function dump(path, data, space) {
     data = serialize(data, space);
     return fsp.writeFile(path, data, { encoding: 'utf8' });
+}
+
+/**
+ * A disposable object with reference counting.
+ * @see https://github.com/eslint/eslint/releases/tag/v9.29.0
+ * @see https://github.com/tc39/proposal-explicit-resource-management
+ */
+export class Disposable {
+    #refCount = 1;
+    acquire() {
+        if (this.disposed)
+            return null;
+        ++this.#refCount;
+        return this;
+    }
+    release() {
+        if (!--this.#refCount)
+            return this.destructor?.();
+    }
+    [Symbol.dispose]() {
+        return this.release();
+    }
+    async [Symbol.asyncDispose]() {
+        return this.release();
+    }
+    get disposed() {
+        return this.#refCount <= 0;
+    }
+    get [Symbol.toStringTag]() {
+        return this.constructor.name;
+    }
 }

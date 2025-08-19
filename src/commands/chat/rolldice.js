@@ -24,7 +24,7 @@ export const data = new SlashCommandBuilder()
         ApplicationIntegrationType.UserInstall,
         ApplicationIntegrationType.GuildInstall
     )
-    .addIntegerOption(opt => opt
+    .addIntegerOption(_ => _
         .setName('dices')
         .setDescription('Dice quantity')
         .setDescriptionLocalizations({
@@ -33,7 +33,7 @@ export const data = new SlashCommandBuilder()
         .setMinValue(1)
         .setMaxValue(5)
     )
-    .addIntegerOption(opt => opt
+    .addIntegerOption(_ => _
         .setName('sides')
         .setDescription('Face quantity')
         .setDescriptionLocalizations({

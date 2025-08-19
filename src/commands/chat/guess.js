@@ -18,19 +18,19 @@ export const data = new SlashCommandBuilder()
     // The game only works on servers where the application is installed.
     // This is because the game requires to view a channel to collect messages.
     .setIntegrationTypes(ApplicationIntegrationType.GuildInstall)
-    .addStringOption(opt => opt
+    .addStringOption(_ => _
         .setName('secret')
         .setDescription('Secret word or phrase')
         .setMaxLength(1024)
         .setRequired(true)
     )
-    .addStringOption(opt => opt
+    .addStringOption(_ => _
         .setName('hint')
         .setDescription('Hint')
         .setMaxLength(1024)
         .setRequired(true)
     )
-    .addStringOption(opt => opt
+    .addStringOption(_ => _
         .setName('timeout')
         .setDescription('Timeout')
         .setMaxLength(19)
