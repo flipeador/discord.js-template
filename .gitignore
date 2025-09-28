@@ -1,0 +1,9 @@
+﻿/src/node_modules/
+/src/pnpm-lock.yaml
+/src/.env
+
+/src/bot/commands/log.json
+/src/bot/database/db.sqlite
+
+/temp/
+/test.js
